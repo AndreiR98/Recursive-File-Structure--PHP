@@ -2,7 +2,7 @@
  Recursive File Structure in PHP
 
 
-# Input:
+Input:
 C:/Documents/Images/Image1.jpg
 C:/Documents/Images/Image2.jpg
 C:/Documents/Images/Image3.jpg
@@ -15,7 +15,7 @@ C:/Program Files/Mysql/Mysql.exe
 C:/Program Files/Mysql/Mysql.com
 
 
-# Output:
+Output:
 Array
 (
     [C:] => Folder Object
