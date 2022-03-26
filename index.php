@@ -13,13 +13,16 @@ while(!feof($open)){
 		$data->setData($getLine);
 	}
 }
+
+
 echo '<pre>';
 print_r($data->getData());
 
-	require('Database.php');
+/*	require('Database.php');
 	$files = new Database();
-	$files = $files->executeStatement("SELECT * FROM files");
-
+	$files = $files->executeStatement("SELECT * FROM files WHERE file_name LIKE '%imag%'");
+    
+    //print_r($files);
 
 	
 	function buildTree(array $elements, $parentId = NULL) {
@@ -39,4 +42,4 @@ print_r($data->getData());
 	}
 	
 	//echo '<pre>';
-	//print_r(buildTree($files));
+	//print_r(buildTree($files));*/

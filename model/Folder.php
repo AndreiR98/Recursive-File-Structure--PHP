@@ -17,11 +17,23 @@ class Folder implements FolderInterface {
 		return $this->id;
 	}
 
+	public function getFiles(){
+		return $this->files;
+	}
+
+	public function getName(){
+		return $this->name;
+	}
+
+	public function getFolders(){
+		return $this->child;
+	}
+
 	public function getChildrens(){
 		return $this->child;
 	}
 
-	public function addContent($item){
+	public function addElement($item){
 		if(strpos($item, ".")){
 			return $this->addFiles($item);
 		}else{

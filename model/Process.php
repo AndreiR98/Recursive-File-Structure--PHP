@@ -12,6 +12,8 @@ class Process{
 
 	private $uniques = [];
 
+	private $test = [];
+
 	public function __construct(){
 		//
 	}
@@ -28,6 +30,7 @@ class Process{
 
 		$this->parseData();
 		$this->createUniques();
+		$this->createHierarchy();
 	}
 
 	public static function checkExtension(String $item){
@@ -39,30 +42,37 @@ class Process{
 	}
 
 	public function createUniques(){
-		$toDir = '';
 		foreach($this->dataParsed as $items){
 			foreach($items as $key=>$item){
 				if(!in_array($item, $this->uniques)){
 					next($items);
 					$this->uniques[$item] = self::checkExtension($items[$key]);
 				}
-
-				//$hierarchy = [array_slice($items, 0, (count($items)))];
-				$hierarchy = $items;
-
-				
 			}
 		}
-		array_push($this->dirs, $hierarchy);
-         $flag = 1;
-		foreach($this->dirs[0] as $key=>$hierarch){
-			
-			if(!strpos($hierarch, ".")){
-				$this->uniques[$hierarch]->addContent($this->dirs[0][$flag]);
-				$this->uniques[$hierarch]->setParent($this->dirs[0][$flag-2]);
+	}
+
+	public static function checkExist($item, $stack){
+		if(strpos($item, '.')){
+			return in_array($item, $stack->getFiles());
+		}
+		return in_array($item, $stack->getFolders());
+	}
+
+	public function createHierarchy(){
+		foreach($this->data as $line){
+			$relations = explode("/", $line);
+			$i = 0;
+			while($i < count($relations)-1){
+				$prev = $relations[$i];
+
+				//Check if next is in prev:
+				if(!self::checkExist($relations[$i+1], $this->uniques[$prev])){
+					$this->uniques[$prev]->addElement($relations[$i+1]);
+					$this->uniques[$relations[$i+1]]->setParent($this->uniques[$prev]->getName());
+				}
+				$i++;
 			}
-			$flag++;
-			
 		}
 	}
 
