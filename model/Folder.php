@@ -1,11 +1,12 @@
 <?php
 
+require_once('File.php');
 require_once('interfaces/FolderInterface.php');
 
-class Folder implements FolderInterface {
+class Folder extends File implements FolderInterface {
 	protected $name;
-	private $id = 'FOLDER';
-	protected $parent;
+	public $id = 'FOLDER';
+	protected $parent = null;
 	protected $child = [];
 	protected $files = [];
 
@@ -13,47 +14,51 @@ class Folder implements FolderInterface {
 		$this->name = $name;
 	}
 
-	public function getID(){
+	public function getID(): string{
 		return $this->id;
 	}
 
-	public function getFiles(){
+	public function getFiles(): Array{
 		return $this->files;
 	}
 
-	public function getName(){
+	public function getName(): String{
 		return $this->name;
 	}
 
-	public function getFolders(){
+	public function getParent(): ?String{
+		return $this->parent;
+	}
+
+	public function getFolders(): Array{
 		return $this->child;
 	}
 
-	public function getChildrens(){
+	public function getChildrens(): Array{
 		return $this->child;
 	}
 
-	public function addElement($item){
+	public function addElement($item): void{
 		if(strpos($item, ".")){
-			return $this->addFiles($item);
+			$this->addFiles($item);
 		}else{
-			return $this->addFolders($item);
+			$this->addFolders($item);
 		}
 	}
 
-	public function addFolders($child){
+	public function addFolders(String $child): void{
 		array_push($this->child, $child);
 	}
 
-	public function addFiles($file){
+	public function addFiles(String $file): void{
 		array_push($this->files, $file);
 	}
 
-	public function setName($name){
+	public function setName(String $name): void{
 		$this->name = $name;
 	}
 
-	public function setParent($parent=''){
+	public function setParent($parent=''): void{
 		$this->parent = $parent;
 	}
 }

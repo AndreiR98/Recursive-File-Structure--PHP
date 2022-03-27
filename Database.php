@@ -1,56 +1,53 @@
 <?php
 
-    class Database {	
+class Database {	
 	
-        public $connection = null;
-		public $sqlHostname = 'localhost';
-		public $sqlUsername = 'root';
-		public $sqlPassword = '';
-		public $sqlDatabase = 'rfs';
+	private $connection = null;
+	private $sqlHostname = 'localhost';
+	private $sqlUsername = 'root';
+	private $sqlPassword = '';
+	private $sqlDatabase = 'rfs';
 
-        // this function is called everytime this class is instantiated		
-        public function __construct(){
-              try {
-				$this->connection = new mysqli($this->sqlHostname, $this->sqlUsername, $this->sqlPassword, $this->sqlDatabase);
+  public function __construct(){
+  	try{
+  		$this->connection = new mysqli($this->sqlHostname, $this->sqlUsername, $this->sqlPassword);
+  		mysqli_select_db($this->connection, $this->sqlDatabase);
+  	}catch(Exception $e){
+  		$errors[] = $e;
+  		return false;
+  	}
+  }
 
-				if( mysqli_connect_errno() ){
-					throw new Exception("Could not connect to database.");   
-				}
-			} catch(Exception $e){
-				throw new Exception($e->getMessage());   
-			}
-        }
-		
-        // Insert a row/s in a Database Table
-        public function Insert( ){
-            
-        }
+  public function CheckFieldName($file){
+  	return $this->ExecuteStatement('SELECT * FROM files WHERE file_name="'.$file.'"')->num_rows;
+  }
 
-        // Select a row/s in a Database Table
-        public function Select($statement){
-            
-        }
-		
-        // Update a row/s in a Database Table
-        public function Update( ){
-            
-        }		
-		
-        // Remove a row/s in a Database Table
-        public function Remove( ){
-            
-        }		
-        
-        // execute statement
-        public function executeStatement($query) {
-		$params = [];
-            $stmt = $this->connection->prepare($query);
-		
-            $stmt->execute();
-			 $result = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);	
-			return $result;
-        }
-		
-    }
-	
+  public function InsertField($name){
+  	return $this->ExecuteStatement('INSERT INTO files (file_name) VALUES ("'.$name.'")');
+  }
+
+  public function ReturnQuery($statement){
+  	return $this->ExecuteStatement($statement)->fetch_assoc();
+  }
+
+   public function InsertFieldDependent($name, $parent, $root, $extension='folder'){
+  	$root_id = $this->ReturnQuery('SELECT file_id FROM files WHERE file_name="'.$root.'"')['file_id'];
+  	$parent_id = $this->ReturnQuery('SELECT file_id FROM files WHERE (file_name="'.$parent.'") AND (root_id='.$root_id.' OR file_id='.$root_id.')')['file_id'];
+  	return $this->ExecuteStatement('INSERT INTO files (file_name, file_parent_id, root_id, file_extension) VALUES ("'.$name.'", '.$parent_id.', '.$root_id.', "'.$extension.'")');
+  }
+
+  public function Delete(){
+  	return $this->ExecuteStatement('DELETE FROM files ORDER BY file_id DESC');
+  }
+
+  public function ExecuteStatement($statement){
+  	return $this->connection->query($statement);
+  }
+
+ 
+
+  
+
+}
+
 ?>
