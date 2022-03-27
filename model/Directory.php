@@ -49,7 +49,15 @@ class Dir{
     /**
      * createUniques
      * 
-     * This method takes each parsed structure and for it's each element
+     * This method takes each parsed structure and for it's each element and creates uniques files or folders objects
+     * For example
+     * C:/Documents/Images/Work/Desk.jpg
+     * Dirc(C:)=[
+     * Folder(Documents)
+     * Folder(Images)
+     * Folder(Work)
+     * File(Desk.jpg)
+     * ]
      * 
      * @param
      * 
@@ -65,7 +73,20 @@ class Dir{
 			}
 		}
 	}
-
+    /**
+     * createHierarchy
+     * 
+     * This method sets for each unique element(folder or file) it's hierarchy
+     * So for example C:/Documents/Images/Work/Desk.jpg
+     * Object_Dir(C:)->folders(Documents)
+     * Object_Folder(Documents)->children(Images)
+     * Object_Folder(Images)->children(Work)
+     * Object_Folder(Work)->files(Desk.jpg)
+     * 
+     * @param
+     * 
+     * @return void
+     * */
 	public function createHierarchy(): void{
 		foreach($this->structure as $line){
 			$relations = explode("/", $line);
@@ -81,11 +102,23 @@ class Dir{
 			}
 		}
 	}
-
+    /**
+     * getData
+     * 
+     * @param
+     * 
+     * @return array
+     * */
 	public function getData(){
 		return $this->uniques;
 	}
-
+    /**
+     * getStructure
+     * 
+     * @param
+     * 
+     * @return array
+     * */
 	public function getStructure(){
 		return $this->structure;
 	}
