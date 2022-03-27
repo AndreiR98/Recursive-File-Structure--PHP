@@ -1,13 +1,20 @@
 <?php
 require_once('Folder.php');
 require_once('File.php');
+
+/**
+ * class Dir(Directory)
+ * 
+ * This object takes each line from .txt file stores it inside structure, this way it can be used latter as hierachy
+ * Each line is then parsed and split at '/' inside structureParsed
+ * */
 class Dir{
-	private $name;
-	protected $folders = [];
-	protected $files = [];
-	protected $structure = [];
-	protected $structureParsed = [];
 	public $uniques = [];
+	protected $structureParsed = [];
+	private $name;
+	private $structure = [];
+	
+	
 
 	public function __construct(String $name=''){
 		$this->name = $name;
@@ -38,7 +45,16 @@ class Dir{
 		$this->createUniques();
 		$this->createHierarchy();
 	}
-
+    
+    /**
+     * createUniques
+     * 
+     * This method takes each parsed structure and for it's each element
+     * 
+     * @param
+     * 
+     * @return void
+     * */
 	public function createUniques(): void{
 		foreach($this->structureParsed as $struct){
 			foreach($struct as $key=>$item){

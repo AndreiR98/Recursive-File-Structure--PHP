@@ -14,8 +14,8 @@
 				<th colspan="2">Recursie File Structure</th>
 			</tr>
 			<tr style="text-align:center">
-				<td>Assign Structure</td>
-				<td>Search</td>
+				<td>Assign Structure:</td>
+				<td>Search by keyword:</td>
 			</tr>
 			<tr>
 				<td>
@@ -23,120 +23,110 @@
 						<input id='addButton' type='submit' value='Add'></td>
 					</form>
 					
-				<td>Search:<input id='searchText' type='text'> - <input id='addButton' type='button' value='Search'></td>
-			</tr>
-			<tr>
-				<td><div id='searchResponse'></div></td>
-			</tr>
-		</table>
-	</div>
-</body>
+					<td>Search:
+						<form action="index.php?action=search" method="POST">
+							<input id='searchText' name='keyword' type='text'> - <input id='addButton' type='submit' value='Search'></td>
+						</form>
 
+					</tr>
+					<tr>
+						<td><div id='searchResponse'></div></td>
+					</tr>
+				</table>
+			</div>
+		</body>
 </html>
 <?php
 if(isset($_GET['action'])){
+	require_once('Database.php');
+	require_once('model/Structure.php');
+	
+	$db = new Database();
+	
 	if($_GET['action'] == 'add'){
-		require_once('model/Structure.php');
-		require_once('Database.php');
-
-		$db = new Database();
-
-		$open = @fopen('structure.txt', 'r');
-
+        
+        $open = @fopen('structure.txt', 'r');
 		$structure = new Structure();
-
+				
 		while(!feof($open)){
 			$getLine = fgets($open);
-
-			if($getLine != ''){
-				$structure->setStructure($getLine);
-			}
+				if($getLine != ''){
+					$structure->setStructure($getLine);
+				}
 		}
-
-		$uniques = [];
-
-		/*foreach($structure->dirs as $key=>$struct){
-			if(!$db->CheckFieldName($key)){
-				$db->InsertField($key);
-			}
-			echo "<pre>";
-			
-
-			$uniques =  [$structure->dirs[$key]->uniques];
-			
-		}*/
-
-		
-        $db->Delete();
+				
+		$db->Delete();
+				
 		foreach($structure->dirs as $key=>$struct){
-			//print_r($struct->uniques);
 			if(!$db->CheckFieldName($key)){
 				$db->InsertField($key);
 			}
+					
 			foreach($struct->uniques as $key2=>$item){
 				if(($item->id == 'FOLDER')&&($item->getName() != $key)){
 					$db->InsertFieldDependent($item->getName(), $item->getParent(), $key);
 				}
+						
 				if(($item->id == 'FILE')){
 					$db->InsertFieldDependent($item->getName(), $item->getParent(), $key, $item->getExtension());
 				}
 			}
 		}
-
-		/**
-		 * Compare each object's with it's parent's parent
-		 * For example:
-		 * C:/Documents/Photos/Images/Img1.jpg
-		 * D:/Documents/Photos/Images/Img2.jpg
-		 * 
-		 * We're set fro C: and D:
-		 * We're also set for Documents having 2 tables with diferent parent's id
-		 * Then For Photos we will only have one table of Photos instead of 2
-		 * So we compare against the hierachy we will compare Photos' parent witch is Documents then we wil compare Documents's parent witch is C: or D: then choose accordingly
-		 * */
-
-		
-
-		//echo "<pre>";
-		//print_r($struct->getData());
-	}
-}
-?>
+	}elseif($_GET['action'] == 'search'){
+		$files = $db->SearchByKeyword($_POST['keyword']);
 
 
+		$parents = [];
 
+		foreach($files as $item){
+			$h = [];
 
+			$parent = $item['file_parent_id'];
 
+			$parents[$item['file_id']] = [];
 
-
-
-
-<?php
-
-
-
-/*	require('Database.php');
-	$files = new Database();
-	$files = $files->executeStatement("SELECT * FROM files WHERE file_name LIKE '%imag%'");
-    
-    //print_r($files);
-
-	
-	function buildTree(array $elements, $parentId = NULL) {
-		$branch = array();
-
-		foreach ($elements as $element) {
-			if ($element['file_parent_id'] == $parentId) {
-				$children = buildTree($elements, $element['file_id']);
-				if ($children) {
-					$element['subcategories'] = $children;
+			do{
+				if($parent){
+					$h[] = $parent;
 				}
-				$branch[] = $element;
-			}
+
+				$parent = $db->getFile($parent)['file_parent_id'];
+			}while($parent);
+
+			$parents[$item['file_id']] = $h;
+
 		}
 
-		return $branch;
+		foreach($parents as $key=>$p){
+			asort($p);
+			$hierachy = [];
+					
+			foreach($p as $id){
+
+				$name = $db->getFile($id)['file_name'];
+
+				$hierachy[] = $name;
+			}
+					
+			$extension = $db->getFile($key)['file_extension'];
+
+			$root = $db->getFile($key)['file_name'];
+
+			if(!($extension=='folder')&&!($extension=='dir')){
+				$root .= ".".$extension;
+			}
+
+
+
+
+			array_push($hierachy, $root);
+
+			$string = implode("/", $hierachy);
+            echo "<pre>";
+            echo "<br/>";
+			print_r($string);
+		}	
+
 	}
-	
-	//echo '<pre>';
-	//print_r(buildTree($files));*/
+}
+

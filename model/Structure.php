@@ -1,34 +1,38 @@
 <?php
-
-require_once('Folder.php');
-require_once('File.php');
 require_once('Directory.php');
 
-class Structure{
-	private $data = [];
 
+/**
+ * class Structure
+ * 
+ * This objects stores each directory C:, D: and it's hierarchy
+ * */
+class Structure extends Dir{
 	public $dirs = [];
-
-	private $dataParsed = [];
-
-	private $uniques = [];
-
-	private $test = [];
 
 	private $structure = [];
 
-	public function __construct(){
-		//
-	}
+	private $sqlStructure = [];
 
-	private function parseData(){
-		foreach($this->data as $line){
-			$explode = explode("/", $line);	
-		}
-		array_push($this->dataParsed, $explode);
-	}
+	public $tree = [];
 
-	public function setStructure($structure){
+	public function __construct($structure=''){
+		//array_push($this->sqlStructure, $this->setTree($structure));
+		array_push($this->sqlStructure, $structure);
+
+		//$this->setTree($this->sqlStructure);
+	}
+    
+    /**
+     * setStructure
+     * 
+     * @param string structure
+     * 
+     * Setting directory structure, setting hierarchy for C:, D:, E:
+     * 
+     * @return void
+     * */
+	public function setStructure(String $structure): void{
 		array_push($this->structure, $structure);
 
 		foreach($this->structure as $struct){
@@ -47,58 +51,14 @@ class Structure{
 			}
 		}
 	}
-
-	/*public function setData($data){
-		array_push($this->data, $data);
-
-		$this->parseData();
-		$this->createUniques();
-		$this->createHierarchy();
-	}
-
-	public static function checkExtension(String $item){
-		if(strpos($item, '.')){
-			return new File($item);
-		}else{
-			return new Folder($item);
-		}
-	}
-
-	public function createUniques(){
-		foreach($this->dataParsed as $items){
-			foreach($items as $key=>$item){
-				if(!in_array($item, $this->uniques)){
-					next($items);
-					$this->uniques[$item] = self::checkExtension($items[$key]);
-				}
-			}
-		}
-	}
-
-	public static function checkExist($item, $stack){
-		if(strpos($item, '.')){
-			return in_array($item, $stack->getFiles());
-		}
-		return in_array($item, $stack->getFolders());
-	}
-
-	public function createHierarchy(){
-		foreach($this->data as $line){
-			$relations = explode("/", $line);
-			$i = 0;
-			while($i < count($relations)-1){
-				$prev = $relations[$i];
-
-				//Check if next is in prev:
-				if(!self::checkExist($relations[$i+1], $this->uniques[$prev])){
-					$this->uniques[$prev]->addElement($relations[$i+1]);
-					$this->uniques[$relations[$i+1]]->setParent($this->uniques[$prev]->getName());
-				}
-				$i++;
-			}
-		}
-	}*/
-
+    
+    /**
+     * getDirs
+     * 
+     * @param
+     * 
+     * @return array
+     * */
 	public function getDirs(){
 		return $this->dirs;
 	}
